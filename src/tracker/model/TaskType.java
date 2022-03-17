@@ -1,4 +1,4 @@
-package task;
+package tracker.model;
 
 public enum TaskType {
     EPIC,

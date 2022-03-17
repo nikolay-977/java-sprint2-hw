@@ -1,13 +1,15 @@
-import task.Epic;
-import task.Status;
-import task.Subtask;
-import task.Task;
+package tracker.controllers;
+
+import tracker.model.Epic;
+import tracker.model.Status;
+import tracker.model.Subtask;
+import tracker.model.Task;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static task.Status.*;
+import static tracker.model.Status.*;
 
 public class Manager {
     private static Integer nextUid;

@@ -1,4 +1,6 @@
-package task;
+package tracker.model;
+
+import java.util.Objects;
 
 public class Task {
     protected String name;
@@ -63,5 +65,19 @@ public class Task {
                 ", status=" + status +
                 ", type=" + type +
                 "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Task)) return false;
+        Task task = (Task) o;
+        return Objects.equals(getName(), task.getName()) && Objects.equals(getDescription(), task.getDescription())
+                && Objects.equals(getUid(), task.getUid()) && getStatus() == task.getStatus() && getType() == task.getType();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getDescription(), getUid(), getStatus(), getType());
     }
 }

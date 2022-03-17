@@ -1,12 +1,15 @@
-import task.Epic;
-import task.Subtask;
-import task.Task;
+package tracker;
+
+import tracker.controllers.Manager;
+import tracker.model.Epic;
+import tracker.model.Subtask;
+import tracker.model.Task;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-import static task.Status.DONE;
-import static task.Status.IN_PROGRESS;
+import static tracker.model.Status.DONE;
+import static tracker.model.Status.IN_PROGRESS;
 
 public class Main {
     public static void main(String[] args) {
