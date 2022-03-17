@@ -21,6 +21,18 @@ public class Epic extends Task {
     }
 
     @Override
+    public String toString() {
+        return "Epic{" +
+                "subtaskUidSet=" + subtaskUidSet +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", uid=" + uid +
+                ", status=" + status +
+                ", type=" + type +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Epic)) return false;
