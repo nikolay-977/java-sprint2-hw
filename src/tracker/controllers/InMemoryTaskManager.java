@@ -15,6 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
     private static Integer nextUid;
     // Возможность хранить задачи всех типов. Для этого вам нужно выбрать подходящую коллекцию.
     private HashMap<Integer, Task> taskHashMap;
+    private HistoryManager historyManager = new InMemoryHistoryManager();
 
     public InMemoryTaskManager() {
         this.taskHashMap = new HashMap<>();
@@ -38,7 +39,9 @@ public class InMemoryTaskManager implements TaskManager {
     // Получение по идентификатору.
     @Override
     public Task getTaskByUid(Integer uid) {
-        return taskHashMap.get(uid);
+        Task task = taskHashMap.get(uid);
+        historyManager.add(task);
+        return task;
     }
 
     // Создание. Сам объект должен передаваться в качестве параметра.
@@ -160,5 +163,10 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStatus(IN_PROGRESS);
         }
         return epic;
+    }
+
+    @Override
+    public List<Task> history() {
+        return historyManager.getDefaultHistory();
     }
 }
