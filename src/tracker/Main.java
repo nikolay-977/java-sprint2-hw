@@ -1,6 +1,6 @@
 package tracker;
 
-import tracker.controllers.Manager;
+import tracker.controllers.InMemoryTaskManager;
 import tracker.model.Epic;
 import tracker.model.Subtask;
 import tracker.model.Task;
@@ -13,7 +13,7 @@ import static tracker.model.Status.IN_PROGRESS;
 
 public class Main {
     public static void main(String[] args) {
-        Manager manager = new Manager();
+        InMemoryTaskManager manager = new InMemoryTaskManager();
         // Создайте 2 задачи,
         Task taskOne = new Task("Name of task one", "Description of task one");
         manager.createTask(taskOne);
