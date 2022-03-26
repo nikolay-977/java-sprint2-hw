@@ -24,11 +24,11 @@ public interface TaskManager {
     void update(Task task);
 
     // Удаление по идентификатору.
-    public void deleteByUid(Integer uid);
+    void deleteByUid(Integer uid);
 
     // Дополнительные методы:
     // Получение списка всех подзадач определённого эпика.
-    public List<Subtask> getEpicSubtaskList(Epic epic);
+    List<Subtask> getEpicSubtaskList(Epic epic);
 
     // Управление статусами осуществляется по следующему правилу:
     // Менеджер сам не выбирает статус для задачи. Информация о нём приходит менеджеру вместе с информацией о самой задаче. По этим данным в одних случаях он будет сохранять статус, в других будет рассчитывать.

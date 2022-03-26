@@ -12,14 +12,46 @@ import java.util.stream.Collectors;
 import static tracker.model.Status.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static Integer nextUid;
+    private static Integer nextUid = 0;
     // Возможность хранить задачи всех типов. Для этого вам нужно выбрать подходящую коллекцию.
     private HashMap<Integer, Task> taskHashMap;
     private HistoryManager historyManager = new InMemoryHistoryManager();
 
     public InMemoryTaskManager() {
         this.taskHashMap = new HashMap<>();
-        this.nextUid = 0;
+    }
+
+    private void updateEpic(Epic epic) {
+        epic = calculateEpicStatus(epic);
+        taskHashMap.put(epic.getUid(), epic);
+    }
+
+    private void updateTask(Task task) {
+        taskHashMap.put(task.getUid(), task);
+    }
+
+    private void updateSubTask(Subtask subtask) {
+        taskHashMap.put(subtask.getUid(), subtask);
+        Integer epicUid = subtask.getEpicUid();
+        Epic epic = (Epic) taskHashMap.get(epicUid);
+        calculateEpicStatus(epic);
+        taskHashMap.put(epicUid, epic);
+    }
+
+    private void deleteSubtaskByUid(Subtask subtask) {
+        Epic epic = (Epic) taskHashMap.get(subtask.getEpicUid());
+        epic.getSubtaskUidSet().remove(subtask.getUid());
+        taskHashMap.remove(subtask.getUid());
+        calculateEpicStatus(epic);
+    }
+
+    private void deleteEpicByUid(Epic epic) {
+        HashSet<Integer> subtaskUidList = epic.getSubtaskUidSet();
+        for (int uid : subtaskUidList) {
+            Subtask subtask = (Subtask) getTaskByUid(uid);
+            subtask.setEpicUid(null);
+        }
+        taskHashMap.remove(epic.getUid());
     }
 
     // Методы для каждого из типа задач(Задача/Эпик/Подзадача):
@@ -33,7 +65,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllTasks() {
         taskHashMap.clear();
-        nextUid = 0;
     }
 
     // Получение по идентификатору.
@@ -63,24 +94,6 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             updateTask(task);
         }
-
-    }
-
-    private void updateEpic(Epic epic) {
-        epic = calculateEpicStatus(epic);
-        taskHashMap.put(epic.getUid(), epic);
-    }
-
-    private void updateTask(Task task) {
-        taskHashMap.put(task.getUid(), task);
-    }
-
-    private void updateSubTask(Subtask subtask) {
-        taskHashMap.put(subtask.getUid(), subtask);
-        Integer epicUid = subtask.getEpicUid();
-        Epic epic = (Epic) taskHashMap.get(epicUid);
-        calculateEpicStatus(epic);
-        taskHashMap.put(epicUid, epic);
     }
 
     // Удаление по идентификатору.
@@ -95,25 +108,6 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             taskHashMap.remove(uid);
         }
-    }
-
-    private void deleteSubtaskByUid(Subtask subtask) {
-        Integer subtaskUid = subtask.getUid();
-        Integer epicUid = subtask.getEpicUid();
-        Epic epic = (Epic) taskHashMap.get(epicUid);
-        epic.getSubtaskUidSet().remove(subtaskUid);
-        taskHashMap.remove(subtask);
-        calculateEpicStatus(epic);
-
-    }
-
-    private void deleteEpicByUid(Epic epic) {
-        HashSet<Integer> subtaskUidList = epic.getSubtaskUidSet();
-        for (int uid : subtaskUidList) {
-            Subtask subtask = (Subtask) getTaskByUid(uid);
-            subtask.setEpicUid(null);
-        }
-        taskHashMap.remove(epic.getUid());
     }
 
     // Дополнительные методы:
@@ -167,6 +161,6 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> history() {
-        return historyManager.getDefaultHistory();
+        return historyManager.getHistory();
     }
 }
