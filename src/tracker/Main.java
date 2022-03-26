@@ -1,7 +1,7 @@
 package tracker;
 
-import tracker.controllers.Managers;
-import tracker.controllers.TaskManager;
+import tracker.managers.Managers;
+import tracker.managers.TaskManager;
 import tracker.model.Epic;
 import tracker.model.Subtask;
 import tracker.model.Task;

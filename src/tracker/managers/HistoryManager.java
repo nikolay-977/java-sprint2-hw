@@ -1,4 +1,4 @@
-package tracker.controllers;
+package tracker.managers;
 
 import tracker.model.Task;
 
