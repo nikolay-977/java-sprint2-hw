@@ -7,14 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private TaskManager tasksManager;
-    private HashMap<Integer, Node> nodeMap = new HashMap<>();
+    private final HashMap<Integer, Node<Task>> taskMap = new HashMap<>();
     private Node<Task> head;
     private Node<Task> tail;
     private int size = 0;
 
-    public InMemoryHistoryManager(TaskManager tasksManager) {
-        this.tasksManager = tasksManager;
+    public InMemoryHistoryManager() {
     }
 
     @Override
@@ -22,16 +20,16 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (size >= 10) {
             remove(head.item.getUid());
         }
-        if (nodeMap.containsKey(task.getUid())) {
+        if (taskMap.containsKey(task.getUid())) {
             remove(task.getUid());
         }
-        nodeMap.put(task.getUid(), linkLast(task));
+        taskMap.put(task.getUid(), linkLast(task));
     }
 
     @Override
     public void remove(int id) {
-        removeNode(nodeMap.get(id));
-        nodeMap.remove(id);
+        removeNode(taskMap.get(id));
+        taskMap.remove(id);
     }
 
     @Override
