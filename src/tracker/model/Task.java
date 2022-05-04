@@ -3,32 +3,24 @@ package tracker.model;
 import java.util.Objects;
 
 public class Task {
-    protected String name;
-    protected String description;
     protected Integer uid;
-    protected Status status;
     protected TaskType type;
+    protected String name;
+    protected Status status;
+    protected String description;
 
     public Task(String name, String description) {
-        this.name = name;
-        this.description = description;
-        this.status = Status.NEW;
         this.type = TaskType.TASK;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
+        this.status = Status.NEW;
+        this.description = description;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
+    public Task(Integer uid, String name, Status status, String description) {
+        this.uid = uid;
+        this.type = TaskType.TASK;
+        this.name = name;
+        this.status = status;
         this.description = description;
     }
 
@@ -40,14 +32,6 @@ public class Task {
         this.uid = uid;
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public TaskType getType() {
         return type;
     }
@@ -56,15 +40,33 @@ public class Task {
         this.type = type;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
-        return "Task{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", uid=" + uid +
-                ", status=" + status +
-                ", type=" + type +
-                "}";
+        return uid + "," + type + "," + name + "," + status + "," + description + ",\n";
     }
 
     @Override

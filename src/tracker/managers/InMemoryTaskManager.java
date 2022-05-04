@@ -14,8 +14,8 @@ import static tracker.model.Status.*;
 public class InMemoryTaskManager implements TaskManager {
     private static Integer nextUid = 0;
     // Возможность хранить задачи всех типов. Для этого вам нужно выбрать подходящую коллекцию.
-    private final HashMap<Integer, Task> taskHashMap = new HashMap<>();
-    private final HistoryManager historyManager = new InMemoryHistoryManager(this);
+    protected final HashMap<Integer, Task> taskHashMap = new HashMap<>();
+    protected final HistoryManager historyManager = new InMemoryHistoryManager(this);
 
     private void updateEpic(Epic epic) {
         epic = calculateEpicStatus(epic);

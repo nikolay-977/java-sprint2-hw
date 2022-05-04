@@ -12,6 +12,12 @@ public class Epic extends Task {
         this.subtaskUidSet = new HashSet<>();
     }
 
+    public Epic(Integer uid, String name, Status status, String description) {
+        super(uid, name, status, description);
+        this.type = TaskType.EPIC;
+        this.subtaskUidSet = new HashSet<>();
+    }
+
     public HashSet<Integer> getSubtaskUidSet() {
         return subtaskUidSet;
     }
@@ -22,14 +28,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
-                "subtaskUidSet=" + subtaskUidSet +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", uid=" + uid +
-                ", status=" + status +
-                ", type=" + type +
-                '}';
+        return uid + "," + type + "," + name + "," + status + "," + description + ",\n";
     }
 
     @Override
