@@ -7,10 +7,17 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private final File file;
+    private final File tasksFile;
+    private final File tasksHistoryFile;
+
     private List<Integer> historyIdList = new ArrayList<>();
+
+    public FileBackedTasksManager(File tasksFile) {
+        this.tasksFile = tasksFile;
+        this.tasksHistoryFile = new File("history_" + tasksFile.getName());
+    }
 
     @Override
     public List<Task> history() {
@@ -27,10 +34,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     public void setHistoryIdList(List<Integer> historyIdList) {
         this.historyIdList = historyIdList;
-    }
-
-    public FileBackedTasksManager(File file) {
-        this.file = file;
     }
 
     @Override
@@ -58,34 +61,57 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         save();
     }
 
-    public void save() {
-        try (FileWriter writer = new FileWriter(file, StandardCharsets.UTF_8)) {
+    //   метод, который будет восстанавливать данные менеджера из файла при запуске программы
+    public static FileBackedTasksManager loadFromFile(File tasksFile) {
+        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(tasksFile);
+        List<String> lines = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(tasksFile, StandardCharsets.UTF_8))) {
+            while (reader.ready()) {
+                String line = reader.readLine();
+                lines.add(line);
+            }
+        } catch (IOException ignored) {
+            throw new ManagerSaveException(String.format("Произошла ошибка во время чтения файла: %s", tasksFile));
+        }
+
+        for (int i = 1; i < lines.size(); i++) {
+            Task task = fileBackedTasksManager.taskFromString(lines.get(i));
+            fileBackedTasksManager.taskHashMap.put(task.getUid(), task);
+        }
+
+        fileBackedTasksManager.setHistoryIdList(loadFromHistoryFile(fileBackedTasksManager.tasksHistoryFile));
+
+        return fileBackedTasksManager;
+    }
+
+    private void save() {
+        try (FileWriter writer = new FileWriter(tasksFile, StandardCharsets.UTF_8)) {
             writer.write("id,type,name,status,description,epic\n");
             for (Map.Entry<Integer, Task> taskEntry : taskHashMap.entrySet()) {
                 writer.write(toString(taskEntry.getValue()));
             }
-            writer.write("\n");
+        } catch (IOException ignored) {
+            throw new ManagerSaveException(String.format("Произошла ошибка во время записи файла: %s", tasksFile));
+        }
+        saveHistory();
+    }
+
+    private void saveHistory() {
+        try (FileWriter writer = new FileWriter(tasksHistoryFile, StandardCharsets.UTF_8)) {
             writer.write(toString(historyManager));
-        } catch (IOException ex) {
-            throw new ManagerSaveException("Произошла ошибка во время записи файла.");
+        } catch (IOException ignored) {
+            throw new ManagerSaveException(String.format("Произошла ошибка во время записи файла: %s", tasksHistoryFile));
         }
     }
 
     // метод сохранения задачи в строку String toString(Task task)
-    public String toString(Task task) {
-        if (task instanceof Subtask) {
-            Subtask subtask = (Subtask) task;
-            return subtask.toString();
-        } else if (task instanceof Epic) {
-            Epic epic = (Epic) task;
-            return epic.toString();
-        } else {
-            return task.toString();
-        }
+    private String toString(Task task) {
+        return task.toString();
     }
 
     // метод создания задачи из строки Task fromString(String value)
-    public Task taskFromString(String value) {
+    private Task taskFromString(String value) {
         Task task;
         String[] taskData = value.split(",");
         Integer id = Integer.valueOf(taskData[0]);
@@ -111,7 +137,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     // метод для сохранения менеджера истории в CSV
-    public static String toString(HistoryManager manager) {
+    private static String toString(HistoryManager manager) {
         List<Task> taskList = manager.getHistory();
         StringBuilder sb = new StringBuilder();
         for (Task task : taskList) {
@@ -125,7 +151,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     // метод для восстановления менеджера истории из CSV
-    public static List<Integer> fromString(String value) {
+    private static List<Integer> fromString(String value) {
         List<Integer> taskList = new ArrayList<>();
 
         for (String stringId : value.split(",")) {
@@ -134,33 +160,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return taskList;
     }
 
-    //   метод который будет восстанавливать данные менеджера из файла при запуске программы
-    public static FileBackedTasksManager loadFromFile(File file) {
-        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
-        List<String> lines = new ArrayList<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-            while (reader.ready()) {
-                String line = reader.readLine();
-                if (line.isEmpty()) {
-                    break;
-                } else {
-                    lines.add(line);
-                }
+    private static List<Integer> loadFromHistoryFile(File tasksHistoryFile) {
+        String line = "";
+        try (BufferedReader reader = new BufferedReader(new FileReader(tasksHistoryFile, StandardCharsets.UTF_8))) {
+            if (reader.ready()) {
+                line = reader.readLine();
             }
-            lines.add(reader.readLine());
-        } catch (IOException ex) {
-            throw new ManagerSaveException("Произошла ошибка во время чтения файла.");
+        } catch (IOException ignored) {
+            throw new ManagerSaveException(String.format("Произошла ошибка во время чтения файла: %s", tasksHistoryFile));
         }
 
-        for (int i = 1; i < lines.size() - 1; i++) {
-            Task task = fileBackedTasksManager.taskFromString(lines.get(i));
-            fileBackedTasksManager.taskHashMap.put(task.getUid(), task);
-        }
-
-        fileBackedTasksManager.setHistoryIdList(fromString(lines.get(lines.size() - 1)));
-
-        return fileBackedTasksManager;
+        return fromString(line);
     }
 
     public static void main(String[] args) {

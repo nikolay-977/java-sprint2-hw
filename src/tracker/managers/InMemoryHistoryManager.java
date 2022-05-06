@@ -12,9 +12,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     private Node<Task> tail;
     private int size = 0;
 
-    public InMemoryHistoryManager() {
-    }
-
     @Override
     public void add(Task task) {
         if (size >= 10) {
