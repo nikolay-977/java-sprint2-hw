@@ -1,9 +1,11 @@
 package tracker.model;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 
 public class Epic extends Task {
+    private LocalDateTime endTime;
     private HashSet<Integer> subtaskUidSet;
 
     public Epic(String name, String description) {
@@ -18,6 +20,12 @@ public class Epic extends Task {
         this.subtaskUidSet = new HashSet<>();
     }
 
+    public Epic(Integer uid, String name, Status status, String description, LocalDateTime startTime, Long duration) {
+        super(uid, name, status, description, startTime, duration);
+        this.type = TaskType.EPIC;
+        this.subtaskUidSet = new HashSet<>();
+    }
+
     public HashSet<Integer> getSubtaskUidSet() {
         return subtaskUidSet;
     }
@@ -26,9 +34,20 @@ public class Epic extends Task {
         this.subtaskUidSet = subtaskUidSet;
     }
 
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
     @Override
     public String toString() {
-        return uid + "," + type + "," + name + "," + status + "," + description + ",\n";
+        return uid + "," + type + "," + name + "," + status + "," + description + "," +
+                ((getStartTime() != null) ? getStartTime().format(FORMATTER) : "") + "," + getDuration() + "," +
+                ((getEndTime() != null) ? getEndTime().format(FORMATTER) : "") + ",\n";
     }
 
     @Override
@@ -37,11 +56,11 @@ public class Epic extends Task {
         if (!(o instanceof Epic)) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return getSubtaskUidSet().equals(epic.getSubtaskUidSet());
+        return Objects.equals(getEndTime(), epic.getEndTime()) && Objects.equals(getSubtaskUidSet(), epic.getSubtaskUidSet());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getSubtaskUidSet());
+        return Objects.hash(super.hashCode(), getEndTime(), getSubtaskUidSet());
     }
 }

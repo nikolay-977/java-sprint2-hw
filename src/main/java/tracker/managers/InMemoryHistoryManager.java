@@ -17,8 +17,12 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (size >= 10) {
             remove(head.item.getUid());
         }
-        if (taskMap.containsKey(task.getUid())) {
-            remove(task.getUid());
+        try {
+            if (taskMap.containsKey(task.getUid())) {
+                remove(task.getUid());
+            }
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException("Некорректный uid");
         }
         taskMap.put(task.getUid(), linkLast(task));
     }

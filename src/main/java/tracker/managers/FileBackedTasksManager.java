@@ -5,7 +5,10 @@ import tracker.model.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
+
+import static tracker.model.Task.FORMATTER;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
@@ -50,8 +53,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void update(Task task) {
-        super.update(task);
+    public void update(Integer uid, Task task) {
+        super.update(uid, task);
         save();
     }
 
@@ -85,9 +88,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return fileBackedTasksManager;
     }
 
-    private void save() {
+    public void save() {
         try (FileWriter writer = new FileWriter(tasksFile, StandardCharsets.UTF_8)) {
-            writer.write("id,type,name,status,description,epic\n");
+            writer.write("id,type,name,status,description,start_time,duration,epic\n");
             for (Map.Entry<Integer, Task> taskEntry : taskHashMap.entrySet()) {
                 writer.write(toString(taskEntry.getValue()));
             }
@@ -119,16 +122,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String name = taskData[2];
         String status = taskData[3];
         String description = taskData[4];
+        LocalDateTime startTime = LocalDateTime.parse(taskData[5], FORMATTER);
+        long duration = Long.valueOf(taskData[6]);
         switch (TaskType.valueOf(type)) {
             case TASK:
-                task = new Task(id, name, Status.valueOf(status), description);
+                task = new Task(id, name, Status.valueOf(status), description, startTime, duration);
                 break;
             case EPIC:
-                task = new Epic(id, name, Status.valueOf(status), description);
+                task = new Epic(id, name, Status.valueOf(status), description, startTime, duration);
                 break;
             case SUB_TASK:
-                Integer epicId = Integer.valueOf(taskData[5]);
-                task = new Subtask(id, name, Status.valueOf(status), description, epicId);
+                Integer epicId = Integer.valueOf(taskData[7]);
+                task = new Subtask(id, name, Status.valueOf(status), description, startTime, duration, epicId);
                 break;
             default:
                 throw new ManagerSaveException("Неизвестный тип задачи.");
@@ -153,10 +158,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     // метод для восстановления менеджера истории из CSV
     private static List<Integer> fromString(String value) {
         List<Integer> taskList = new ArrayList<>();
-
-        for (String stringId : value.split(",")) {
-            taskList.add(Integer.valueOf(stringId));
+        if (!value.isEmpty()) {
+            for (String stringId : value.split(",")) {
+                taskList.add(Integer.valueOf(stringId));
+            }
         }
+
         return taskList;
     }
 
@@ -191,7 +198,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", uidEpicOne);
         int uidSubtaskThree = fileBackedTasksManager.createTask(subtaskThree);
         epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
-        fileBackedTasksManager.update(epicOne);
+        fileBackedTasksManager.update(uidEpicOne, epicOne);
         // эпик без подзадач
         Epic epicTwo = new Epic("Name of epic two", "Description of epic two");
         fileBackedTasksManager.createTask(epicTwo);

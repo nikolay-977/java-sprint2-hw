@@ -1,5 +1,6 @@
 package tracker.model;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -11,8 +12,20 @@ public class Subtask extends Task {
         this.epicUid = epicUid;
     }
 
+    public Subtask(String name, String description, LocalDateTime startTime, Long duration, Integer epicUid) {
+        super(name, description, startTime, duration);
+        this.type = TaskType.SUB_TASK;
+        this.epicUid = epicUid;
+    }
+
     public Subtask(Integer uid, String name, Status status, String description, Integer epicUid) {
         super(uid, name, status, description);
+        this.type = TaskType.SUB_TASK;
+        this.epicUid = epicUid;
+    }
+
+    public Subtask(Integer uid, String name, Status status, String description, LocalDateTime startTime, Long duration, Integer epicUid) {
+        super(uid, name, status, description, startTime, duration);
         this.type = TaskType.SUB_TASK;
         this.epicUid = epicUid;
     }
@@ -27,7 +40,9 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return uid + "," + type + "," + name + "," + status + "," + description + "," + epicUid + "\n";
+        return uid + "," + type + "," + name + "," + status + "," + description + "," +
+                ((getStartTime() != null) ? getStartTime().format(FORMATTER) : "") + "," + getDuration() + "," +
+                ((getEndTime() != null) ? getEndTime().format(FORMATTER) : "") + "," + epicUid + "\n";
     }
 
     @Override

@@ -21,7 +21,7 @@ public interface TaskManager {
     Integer createTask(Task task);
 
     // Обновление. Новая версия объекта с верным идентификатором передаются в виде параметра.
-    void update(Task task);
+    void update(Integer id, Task task);
 
     // Удаление по идентификатору.
     void deleteByUid(Integer uid);
@@ -37,4 +37,10 @@ public interface TaskManager {
 
     // История просмотров задач
     List<Task> history();
+
+    // Список задач в порядке приоритета
+    Set<Task> getPrioritizedTasks();
+
+    // Проверьте пересечения
+    boolean validateIntersections();
 }
