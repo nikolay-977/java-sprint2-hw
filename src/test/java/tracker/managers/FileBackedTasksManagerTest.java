@@ -28,7 +28,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     @Test
     void epicWithoutSubtasks() {
         Epic epicWithoutSubtasks = new Epic("Name of epic without subtasks", "Description of epic without subtasks");
-        int epicUid = taskManager.createTask(epicWithoutSubtasks);
+        taskManager.createTask(epicWithoutSubtasks);
         taskManager.save();
         FileBackedTasksManager taskManagerFromFile = FileBackedTasksManager.loadFromFile(new File(FILE_NAME));
         assertEquals(Collections.emptyList(), taskManagerFromFile.getEpicSubtaskList(epicWithoutSubtasks));

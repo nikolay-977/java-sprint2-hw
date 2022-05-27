@@ -14,7 +14,7 @@ class TaskTest {
     @Test
     void getString(){
         LocalDateTime startTime = LocalDateTime.now();
-        Long duration = 1l;
+        Long duration = 1L;
         LocalDateTime endTime = startTime.plusMinutes(duration);
         TaskManager taskManager = Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one", startTime, duration);

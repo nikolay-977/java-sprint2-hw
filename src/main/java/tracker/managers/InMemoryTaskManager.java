@@ -111,8 +111,7 @@ public class InMemoryTaskManager implements TaskManager {
         } else if (task instanceof Epic) {
             deleteEpicByUid((Epic) task);
         } else {
-            taskHashMap.remove(uid);
-            historyManager.remove(uid);
+            removeTaskByUid(uid);
         }
     }
 
@@ -187,9 +186,12 @@ public class InMemoryTaskManager implements TaskManager {
             startTimeList.add(getTaskByUid(uid).getStartTime());
         }
 
-        LocalDateTime startTime = startTimeList.stream().min(LocalDateTime::compareTo).get();
-        epic.setStartTime(startTime);
-
+        try {
+            LocalDateTime startTime = startTimeList.stream().min(LocalDateTime::compareTo).get();
+            epic.setStartTime(startTime);
+        } catch (NoSuchElementException e) {
+            System.out.println("Коллекция startTimeList пустая");
+        }
         return epic;
     }
 
@@ -201,9 +203,12 @@ public class InMemoryTaskManager implements TaskManager {
             startTimeList.add(getTaskByUid(uid).getEndTime());
         }
 
-        LocalDateTime startTime = startTimeList.stream().max(LocalDateTime::compareTo).get();
-        epic.setEndTime(startTime);
-
+        try {
+            LocalDateTime startTime = startTimeList.stream().max(LocalDateTime::compareTo).get();
+            epic.setEndTime(startTime);
+        } catch (NoSuchElementException e) {
+            System.out.println("Коллекция startTimeList пустая");
+        }
         return epic;
     }
 

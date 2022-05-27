@@ -6,8 +6,8 @@ import tracker.model.Epic;
 import tracker.model.Subtask;
 import tracker.model.Task;
 
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static tracker.model.Status.*;
@@ -26,7 +26,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidEpicOne = taskManager.createTask(epicOne);
         Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
         int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
         taskManager.update(uidEpicOne, epicOne);
         assertEquals(epicOne.getUid(), subtaskOne.getEpicUid());
     }
@@ -43,7 +43,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidSubtaskTwo = taskManager.createTask(subtaskTwo);
         Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", uidEpicOne);
         int uidSubtaskThree = taskManager.createTask(subtaskThree);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
 
         subtaskOne.setStatus(NEW);
         subtaskTwo.setStatus(NEW);
@@ -63,7 +63,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidSubtaskTwo = taskManager.createTask(subtaskTwo);
         Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", uidEpicOne);
         int uidSubtaskThree = taskManager.createTask(subtaskThree);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
 
         subtaskOne.setStatus(NEW);
         subtaskTwo.setStatus(IN_PROGRESS);
@@ -83,7 +83,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidSubtaskTwo = taskManager.createTask(subtaskTwo);
         Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", uidEpicOne);
         int uidSubtaskThree = taskManager.createTask(subtaskThree);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
 
         subtaskOne.setStatus(DONE);
         subtaskTwo.setStatus(DONE);
@@ -109,7 +109,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidSubtaskTwo = taskManager.createTask(subtaskTwo);
         Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", uidEpicOne);
         int uidSubtaskThree = taskManager.createTask(subtaskThree);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
         taskManager.update(uidEpicOne, epicOne);
         taskManager.deleteAllTasks();
         assertTrue(taskManager.getTaskHashMap().isEmpty());
@@ -124,7 +124,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidEpicOne = taskManager.createTask(epicOne);
         Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
         int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
         taskManager.update(uidEpicOne, epicOne);
         assertEquals(taskOne, taskManager.getTaskHashMap().get(uidTaskOne));
         assertEquals(epicOne, taskManager.getTaskHashMap().get(uidEpicOne));
@@ -140,7 +140,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidEpicOne = taskManager.createTask(epicOne);
         Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
         int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
         taskManager.update(uidEpicOne, epicOne);
         taskManager.getTaskHashMap().clear();
         assertNull(taskManager.getTaskHashMap().get(uidTaskOne));
@@ -157,7 +157,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidEpicOne = taskManager.createTask(epicOne);
         Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
         int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
         taskManager.update(uidEpicOne, epicOne);
         assertEquals(taskOne, taskManager.getTaskHashMap().get(uidTaskOne));
         assertEquals(epicOne, taskManager.getTaskHashMap().get(uidEpicOne));
@@ -179,7 +179,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidSubtaskOne = taskManager.createTask(subtaskOne);
         Subtask subtaskOneUpdated = new Subtask("Name of subtask one updated", "Description of subtask one updated", uidEpicOne);
         subtaskOneUpdated.setUid(uidSubtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
         taskManager.update(uidTaskOne, taskOneUpdated);
         taskManager.update(uidEpicOne, epicOneUpdated);
         taskManager.update(uidSubtaskOne, subtaskOneUpdated);
@@ -203,7 +203,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidSubtaskOne = taskManager.createTask(subtaskOne);
         Subtask subtaskOneUpdated = new Subtask("Name of subtask one updated", "Description of subtask one updated", uidEpicOne);
         subtaskOneUpdated.setUid(uidSubtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
         taskManager.getTaskHashMap().clear();
         final IllegalArgumentException taskException = assertThrows(IllegalArgumentException.class, () -> taskManager.update(uidTaskOne, taskOneUpdated));
         assertEquals("Некорректный uid", taskException.getMessage());
@@ -222,7 +222,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidEpicOne = taskManager.createTask(epicOne);
         Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
         int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
         taskManager.update(uidEpicOne, epicOne);
         taskManager.deleteByUid(taskOne.getUid());
         taskManager.deleteByUid(subtaskOne.getUid());
@@ -241,7 +241,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int uidEpicOne = taskManager.createTask(epicOne);
         Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
         int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
         taskManager.update(uidEpicOne, epicOne);
         taskManager.getTaskHashMap().clear();
         final IncorrectUidException taskException = assertThrows(IncorrectUidException.class, () -> taskManager.deleteByUid(uidTaskOne));

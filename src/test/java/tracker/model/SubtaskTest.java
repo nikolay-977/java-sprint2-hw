@@ -5,8 +5,8 @@ import tracker.managers.Managers;
 import tracker.managers.TaskManager;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static tracker.model.Task.FORMATTER;
@@ -19,8 +19,10 @@ class SubtaskTest extends TaskTest {
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
         int expectedUidEpicOne = taskManager.createTask(epicOne);
         Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", expectedUidEpicOne);
+        subtaskOne.setStartTime(LocalDateTime.now());
+        subtaskOne.setDuration(1l);
         int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
         taskManager.update(epicOne.getUid(), epicOne);
         Integer actualUidEpicOne = ((Subtask) taskManager.getTaskHashMap().get(uidSubtaskOne)).getEpicUid();
         assertEquals(expectedUidEpicOne, actualUidEpicOne);
@@ -30,7 +32,7 @@ class SubtaskTest extends TaskTest {
     void getString() {
         TaskManager taskManager = Managers.getDefault();
         LocalDateTime startTime = LocalDateTime.now();
-        Long duration = 1l;
+        Long duration = 1L;
         LocalDateTime endTime = startTime.plusMinutes(duration);
         Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", startTime, duration, null);
         taskManager.createTask(subtaskOne);

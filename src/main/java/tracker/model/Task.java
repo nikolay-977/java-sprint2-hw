@@ -21,7 +21,6 @@ public class Task {
         this.status = Status.NEW;
         this.description = description;
         this.startTime = LocalDateTime.now();
-        this.duration = 0l;
     }
 
     public Task(String name, String description, LocalDateTime startTime, long duration) {

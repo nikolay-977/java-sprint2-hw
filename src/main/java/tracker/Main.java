@@ -7,31 +7,38 @@ import tracker.model.Subtask;
 import tracker.model.Task;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
         // две задачи
         LocalDateTime taskOneStartTime = LocalDateTime.now();
-        long taskOneDuration = 1l;
+        long taskOneDuration = 1L;
         Task taskOne = new Task("Name of task one", "Description of task one", taskOneStartTime, taskOneDuration);
         taskManager.createTask(taskOne);
         LocalDateTime taskTwoStartTime = taskOneStartTime.plusMinutes(2l);
-        long taskTwoDuration = 1l;
+        long taskTwoDuration = 1L;
         Task taskTwo = new Task("Name of task two", "Description of task two", taskTwoStartTime, taskTwoDuration);
         taskManager.createTask(taskTwo);
         // эпик с тремя подзадачами
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
+        epicOne.setStartTime(taskTwoStartTime.plusDays(1L));
         int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
+        LocalDateTime subtaskOneStartTime = taskTwoStartTime.plusMinutes(2l);
+        long subtaskOneDuration = 1L;
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", subtaskOneStartTime, subtaskOneDuration, uidEpicOne);
         int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", uidEpicOne);
+        LocalDateTime subtaskTwoStartTime = subtaskOneStartTime.plusMinutes(2l);
+        long subtaskTwoDuration = 1L;
+        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", subtaskTwoStartTime, subtaskTwoDuration, uidEpicOne);
         int uidSubtaskTwo = taskManager.createTask(subtaskTwo);
-        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", uidEpicOne);
+        LocalDateTime subtaskThreeStartTime = subtaskTwoStartTime.plusMinutes(2l);
+        long subtaskThreeDuration = 1L;
+        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", subtaskThreeStartTime, subtaskThreeDuration, uidEpicOne);
         int uidSubtaskThree = taskManager.createTask(subtaskThree);
-        epicOne.setSubtaskUidSet(new HashSet<>(Arrays.asList(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
         taskManager.update(epicOne.getUid(), epicOne);
         // История просмотров задач
         // Запросите созданные задачи несколько раз в разном порядке
