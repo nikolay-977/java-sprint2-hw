@@ -17,8 +17,12 @@ import static tracker.model.Status.*;
 public class InMemoryTaskManager implements TaskManager {
     private static Integer nextUid = 0;
     // Возможность хранить задачи всех типов. Для этого вам нужно выбрать подходящую коллекцию.
-    protected final HashMap<Integer, Task> taskHashMap = new HashMap<>();
-    protected final HistoryManager historyManager = new InMemoryHistoryManager();
+    protected List<Task> tasks = new ArrayList<>();
+    protected List<Epic> epics = new ArrayList<>();
+    protected List<Subtask> subtasks = new ArrayList<>();
+    protected HistoryManager historyManager = new InMemoryHistoryManager();
+
+    public InMemoryTaskManager(){}
 
     public HistoryManager getHistoryManager() {
         return historyManager;
@@ -40,38 +44,79 @@ public class InMemoryTaskManager implements TaskManager {
         }
     });
 
-    private void updateEpic(Integer epicUid, Epic epic) {
-        epic = calculateEpicStatus(epic);
-        taskHashMap.put(epicUid, epic);
-    }
 
     // Методы для каждого из типа задач(Задача/Эпик/Подзадача):
     // Получение списка всех задач.
     @Override
-    public HashMap<Integer, Task> getTaskHashMap() {
-        return taskHashMap;
+    public List<Task> getAllTasksList() {
+        return tasks;
+    }
+
+    @Override
+    public List<Epic> getAllEpicsList() {
+        return epics;
+    }
+
+    @Override
+    public List<Subtask> getAllSubtasksList() {
+        return subtasks;
     }
 
     // Удаление всех задач.
     @Override
     public void deleteAllTasks() {
-        taskHashMap.clear();
+        tasks.clear();
+    }
+
+    @Override
+    public void deleteAllEpics() {
+        epics.clear();
+    }
+
+    @Override
+    public void deleteAllSubtasks() {
+        subtasks.clear();
     }
 
     // Получение по идентификатору.
     @Override
     public Task getTaskByUid(Integer uid) {
-        if (!taskHashMap.containsKey(uid)) {
+        Map<Integer, Task> tasksMap = tasks.stream().collect(Collectors.toMap(Task::getUid, Function.identity()));
+        if (!tasksMap.containsKey(uid)) {
             throw new IncorrectUidException("Некорректный uid");
         }
-        Task task = taskHashMap.get(uid);
+        Task task = tasksMap.get(uid);
         historyManager.add(task);
         return task;
     }
 
+    @Override
+    public Epic getEpicByUid(Integer uid) {
+        Map<Integer, Epic> epicsMap = epics.stream().collect(Collectors.toMap(Epic::getUid, Function.identity()));
+        if (!epicsMap.containsKey(uid)) {
+            throw new IncorrectUidException("Некорректный uid");
+        } else {
+            Epic epic = epicsMap.get(uid);
+            historyManager.add(epic);
+            return epic;
+        }
+    }
+
+    @Override
+    public Subtask getSubtaskByUid(Integer uid) {
+        Map<Integer, Subtask> subtasksMap = subtasks.stream().collect(Collectors.toMap(Subtask::getUid, Function.identity()));
+        if (!subtasksMap.containsKey(uid)) {
+            throw new IncorrectUidException("Некорректный uid");
+        } else {
+            Subtask subtask = subtasksMap.get(uid);
+            historyManager.add(subtask);
+            return subtask;
+        }
+    }
+
     // Создание. Сам объект должен передаваться в качестве параметра.
     @Override
-    public Integer createTask(Task task) {
+    public Task addTask(Task task) {
         prioritizedTasks.add(task);
         if (validateIntersections()) {
             prioritizedTasks.remove(task);
@@ -79,50 +124,180 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             int uid = ++nextUid;
             task.setUid(uid);
-            taskHashMap.put(uid, task);
-            return uid;
+            tasks.add(task);
+            return task;
+        }
+    }
+
+    @Override
+    public Epic addEpic(Epic epic) {
+        prioritizedTasks.add(epic);
+        if (validateIntersections()) {
+            prioritizedTasks.remove(epic);
+            throw new IntersectionException("Пересечение задач");
+        } else {
+            int uid = ++nextUid;
+            epic.setUid(uid);
+            epics.add(epic);
+            return epic;
+        }
+    }
+
+    @Override
+    public Subtask addSubtask(Subtask subtask) {
+        prioritizedTasks.add(subtask);
+        if (validateIntersections()) {
+            prioritizedTasks.remove(subtask);
+            throw new IntersectionException("Пересечение задач");
+        } else {
+            int uid = ++nextUid;
+            subtask.setUid(uid);
+            subtasks.add(subtask);
+            return subtask;
         }
     }
 
     // Обновление. Новая версия объекта с верным идентификатором передаются в виде параметра.
     @Override
-    public void update(Integer uid, Task task) {
-        if (!taskHashMap.containsKey(uid)) {
-            throw new IllegalArgumentException("Некорректный uid");
-        }
-        if (task instanceof Subtask) {
-            updateSubTask(uid, (Subtask) task);
-        } else if (task instanceof Epic) {
-            updateEpic(uid, (Epic) task);
+    public void updateTask(Task task) {
+        Map<Integer, Task> tasksMap = tasks.stream().collect(Collectors.toMap(Task::getUid, Function.identity()));
+        if (!tasksMap.containsKey(task.getUid())) {
+            throw new IncorrectUidException("Некорректный uid");
         } else {
-            updateTask(uid, task);
+            prioritizedTasks.add(task);
+            if (validateIntersections()) {
+                prioritizedTasks.remove(task);
+            } else {
+                int indexOfItem = -1;
+
+                for (Task taskItem : tasks) {
+                    if (taskItem.getUid().equals(taskItem.getUid())) {
+                        indexOfItem = tasks.indexOf(taskItem);
+                    }
+                }
+
+                tasks.remove(indexOfItem);
+                tasks.add(task);
+            }
+        }
+    }
+
+    @Override
+    public void updateEpic(Epic epic) {
+        Map<Integer, Epic> epicsMap = epics.stream().collect(Collectors.toMap(Epic::getUid, Function.identity()));
+        if (!epicsMap.containsKey(epic.getUid())) {
+            throw new IncorrectUidException("Некорректный uid");
+        } else {
+            epic = calculateEpicStatus(epic);
+
+            int indexOfItem = -1;
+
+            for (Epic epicItem : epics) {
+                if (epicItem.getUid().equals(epic.getUid())) {
+                    indexOfItem = epics.indexOf(epicItem);
+                }
+            }
+
+            this.epics.remove(indexOfItem);
+            this.epics.add(epic);
+        }
+    }
+
+    @Override
+    public void updateSubtask(Subtask subtask) {
+        Map<Integer, Subtask> subtasksMap = subtasks.stream().collect(Collectors.toMap(Subtask::getUid, Function.identity()));
+        if (!subtasksMap.containsKey(subtask.getUid())) {
+            throw new IncorrectUidException("Некорректный uid");
+        } else {
+            prioritizedTasks.add(subtask);
+            if (validateIntersections()) {
+                prioritizedTasks.remove(subtask);
+                throw new IntersectionException("Пересечение задач");
+            } else {
+                Map<Integer, Subtask> subtaskMap = subtasks.stream().collect(Collectors.toMap(Subtask::getUid, Function.identity()));
+                int indexOfSubtaskItem = -1;
+
+                for (Subtask subtaskItem : subtasks) {
+                    if (subtaskItem.getUid().equals(subtask.getUid())) {
+                        indexOfSubtaskItem = subtasks.indexOf(subtaskItem);
+                    }
+                }
+
+                subtasks.remove(indexOfSubtaskItem);
+                subtasks.add(subtask);
+
+                Map<Integer, Epic> epicsMap = epics.stream().collect(Collectors.toMap(Epic::getUid, Function.identity()));
+
+                Integer epicUid = subtask.getEpicUid();
+                Epic epic = epicsMap.get(epicUid);
+
+                if (epic != null) {
+                    calculateEpicStatus(epic);
+
+                    int indexOfEpicItem = -1;
+
+                    for (Epic epicItem : epics) {
+                        if (epicItem.getUid().equals(epic.getUid())) {
+                            indexOfEpicItem = epics.indexOf(epicItem);
+                        }
+                    }
+
+                    epics.remove(indexOfEpicItem);
+                    epics.add(epic);
+                }
+            }
         }
     }
 
     // Удаление по идентификатору.
     @Override
-    public void deleteByUid(Integer uid) {
-        if (!taskHashMap.containsKey(uid)) {
+    public void deleteTaskByUid(Integer uid) {
+        Map<Integer, Task> tasksMap = tasks.stream().collect(Collectors.toMap(Task::getUid, Function.identity()));
+        if (!tasksMap.containsKey(uid)) {
             throw new IncorrectUidException("Некорректный uid");
         }
-        Task task = getTaskByUid(uid);
-        if (task instanceof Subtask) {
-            deleteSubtaskByUid((Subtask) task);
-        } else if (task instanceof Epic) {
-            deleteEpicByUid((Epic) task);
+        removeTaskByUid(uid);
+    }
+
+    @Override
+    public void deleteEpicByUid(Integer uid) {
+        Map<Integer, Epic> epicsMap = epics.stream().collect(Collectors.toMap(Epic::getUid, Function.identity()));
+        if (!epicsMap.containsKey(uid)) {
+            throw new IncorrectUidException("Некорректный uid");
         } else {
-            removeTaskByUid(uid);
+            Epic epic = epicsMap.get(uid);
+            Set<Integer> subtaskUidList = epic.getSubtaskUidSet();
+            for (Integer subTaskUid : subtaskUidList) {
+                removeSubtaskByUid(subTaskUid);
+            }
+            removeEpicByUid(epic.getUid());
         }
+    }
+
+    @Override
+    public void deleteSubtaskByUid(Integer uid) {
+        Map<Integer, Subtask> subtasksMap = subtasks.stream().collect(Collectors.toMap(Subtask::getUid, Function.identity()));
+        if (!subtasksMap.containsKey(uid)) {
+            throw new IncorrectUidException("Некорректный uid");
+        }
+        Map<Integer, Epic> epicsMap = epics.stream().collect(Collectors.toMap(Epic::getUid, Function.identity()));
+        Subtask subtask = getSubtaskByUid(uid);
+        Epic epic = epicsMap.get(subtask.getEpicUid());
+        if (epic != null) {
+            epic.getSubtaskUidSet().remove(subtask);
+            calculateEpicStatus(epic);
+        }
+        removeSubtaskByUid(subtask.getUid());
     }
 
     // Дополнительные методы:
     // Получение списка всех подзадач определённого эпика.
     @Override
-    public List<Subtask> getEpicSubtaskList(Epic epic) {
+    public List<Subtask> getSubtaskOfEpic(Epic epic) {
         List<Subtask> subtaskList = new ArrayList<>();
-        HashSet<Integer> subtaskUidList = epic.getSubtaskUidSet();
+        Set<Integer> subtaskUidList = epic.getSubtaskUidSet();
         for (int uid : subtaskUidList) {
-            subtaskList.add((Subtask) getTaskByUid(uid));
+            subtaskList.add(getSubtaskByUid(uid));
         }
         return subtaskList;
     }
@@ -132,7 +307,7 @@ public class InMemoryTaskManager implements TaskManager {
     // Для эпиков:
     @Override
     public Epic calculateEpicStatus(Epic epic) {
-        HashSet<Integer> subtaskUidList = epic.getSubtaskUidSet();
+        Set<Integer> subtaskUidList = epic.getSubtaskUidSet();
         int countSubtask = subtaskUidList.size();
         // если у эпика нет подзадач, то статус должен быть NEW.
         if (countSubtask == 0) {
@@ -144,7 +319,7 @@ public class InMemoryTaskManager implements TaskManager {
         List<Status> statusList = new ArrayList<>();
 
         for (Integer uid : subtaskUidList) {
-            statusList.add(getTaskByUid(uid).getStatus());
+            statusList.add(getSubtaskByUid(uid).getStatus());
         }
 
         Map<Status, Integer> statusCount = statusList.stream()
@@ -167,11 +342,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private Epic calculateEpicDuration(Epic epic) {
-        HashSet<Integer> subtaskUidList = epic.getSubtaskUidSet();
+        Set<Integer> subtaskUidList = epic.getSubtaskUidSet();
         List<Long> durationList = new ArrayList<>();
 
         for (Integer uid : subtaskUidList) {
-            durationList.add(getTaskByUid(uid).getDuration());
+            durationList.add(getSubtaskByUid(uid).getDuration());
         }
 
         epic.setDuration(durationList.stream().mapToLong(i -> i).sum());
@@ -179,11 +354,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private Epic setStartTime(Epic epic) {
-        HashSet<Integer> subtaskUidList = epic.getSubtaskUidSet();
+        Set<Integer> subtaskUidList = epic.getSubtaskUidSet();
         List<LocalDateTime> startTimeList = new ArrayList<>();
 
         for (Integer uid : subtaskUidList) {
-            startTimeList.add(getTaskByUid(uid).getStartTime());
+            startTimeList.add(getSubtaskByUid(uid).getStartTime());
         }
 
         try {
@@ -196,11 +371,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private Epic setEndTime(Epic epic) {
-        HashSet<Integer> subtaskUidList = epic.getSubtaskUidSet();
+        Set<Integer> subtaskUidList = epic.getSubtaskUidSet();
         List<LocalDateTime> startTimeList = new ArrayList<>();
 
         for (Integer uid : subtaskUidList) {
-            startTimeList.add(getTaskByUid(uid).getEndTime());
+            startTimeList.add(getSubtaskByUid(uid).getEndTime());
         }
 
         try {
@@ -243,48 +418,44 @@ public class InMemoryTaskManager implements TaskManager {
         return result;
     }
 
-    private void updateTask(Integer tasUid, Task task) {
-        prioritizedTasks.add(task);
-        if (validateIntersections()) {
-            prioritizedTasks.remove(task);
-        } else {
-            taskHashMap.put(tasUid, task);
-        }
-    }
-
-    private void updateSubTask(Integer subTaskUid, Subtask subtask) {
-        prioritizedTasks.add(subtask);
-        if (validateIntersections()) {
-            prioritizedTasks.remove(subtask);
-            throw new IntersectionException("Пересечение задач");
-        } else {
-            taskHashMap.put(subTaskUid, subtask);
-            Integer epicUid = subtask.getEpicUid();
-            Epic epic = (Epic) taskHashMap.get(epicUid);
-            calculateEpicStatus(epic);
-            taskHashMap.put(epicUid, epic);
-        }
-    }
-
-    private void deleteSubtaskByUid(Subtask subtask) {
-        Epic epic = (Epic) taskHashMap.get(subtask.getEpicUid());
-        Integer subtaskUid = subtask.getUid();
-        epic.getSubtaskUidSet().remove(subtaskUid);
-        removeTaskByUid(subtaskUid);
-        calculateEpicStatus(epic);
-    }
-
-    private void deleteEpicByUid(Epic epic) {
-        HashSet<Integer> subtaskUidList = epic.getSubtaskUidSet();
-        for (Integer uid : subtaskUidList) {
-            removeTaskByUid(uid);
-        }
-        removeTaskByUid(epic.getUid());
-    }
-
     private void removeTaskByUid(Integer uid) {
-        prioritizedTasks.remove(getTaskHashMap().get(uid));
-        taskHashMap.remove(uid);
+        Map<Integer, Task> tasksMap = tasks.stream().collect(Collectors.toMap(Task::getUid, Function.identity()));
+        Task task = tasksMap.get(uid);
+        prioritizedTasks.remove(task);
+        tasks.remove(task);
         historyManager.remove(uid);
+    }
+
+    private void removeEpicByUid(Integer uid) {
+        Map<Integer, Epic> subtaskMap = epics.stream().collect(Collectors.toMap(Epic::getUid, Function.identity()));
+        Epic epic = subtaskMap.get(uid);
+        prioritizedTasks.remove(epic);
+        epics.remove(epic);
+        historyManager.remove(uid);
+    }
+
+    private void removeSubtaskByUid(Integer uid) {
+        Map<Integer, Subtask> subtaskMap = subtasks.stream().collect(Collectors.toMap(Subtask::getUid, Function.identity()));
+        Subtask subtask = subtaskMap.get(uid);
+        prioritizedTasks.remove(subtask);
+        subtasks.remove(subtask);
+        historyManager.remove(uid);
+    }
+
+
+    protected void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
+
+    protected void setEpics(List<Epic> epics) {
+        this.epics = epics;
+    }
+
+    protected void setSubtasks(List<Subtask> subtasks) {
+        this.subtasks = subtasks;
+    }
+
+    protected void setPrioritizedTasks(TreeSet<Task> prioritizedTasks) {
+        this.prioritizedTasks = prioritizedTasks;
     }
 }

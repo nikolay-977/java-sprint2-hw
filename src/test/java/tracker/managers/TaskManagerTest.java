@@ -23,251 +23,255 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void getEpicSubtaskList() {
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
-        taskManager.update(uidEpicOne, epicOne);
+        Epic addedEpic = taskManager.addEpic(epicOne);
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpic.getUid());
+        Subtask addedSubtaskOne = taskManager.addSubtask(subtaskOne);
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(addedSubtaskOne.getUid())));
+        taskManager.updateEpic(addedEpic);
         assertEquals(epicOne.getUid(), subtaskOne.getEpicUid());
     }
 
     //    расчёт статуса для эпика
     @Test
     void calculateEpicStatusNew() {
-        TaskManager taskManager = Managers.getDefault();
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", uidEpicOne);
-        int uidSubtaskTwo = taskManager.createTask(subtaskTwo);
-        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", uidEpicOne);
-        int uidSubtaskThree = taskManager.createTask(subtaskThree);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        Subtask addedSubtaskOne = taskManager.addSubtask(subtaskOne);
+        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", addedEpicOne.getUid());
+        Subtask addedSubtaskTwo = taskManager.addSubtask(subtaskTwo);
+        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", addedEpicOne.getUid());
+        Subtask addedSubtaskThree = taskManager.addSubtask(subtaskThree);
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(addedSubtaskOne.getUid(), addedSubtaskTwo.getUid(), addedSubtaskThree.getUid())));
 
         subtaskOne.setStatus(NEW);
         subtaskTwo.setStatus(NEW);
         subtaskThree.setStatus(NEW);
-        taskManager.update(uidEpicOne, epicOne);
+        taskManager.updateEpic(epicOne);
         assertEquals(NEW, epicOne.getStatus());
     }
 
     @Test
     void calculateEpicStatusInProgress() {
-        TaskManager taskManager = Managers.getDefault();
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", uidEpicOne);
-        int uidSubtaskTwo = taskManager.createTask(subtaskTwo);
-        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", uidEpicOne);
-        int uidSubtaskThree = taskManager.createTask(subtaskThree);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
-
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        taskManager.addSubtask(subtaskOne);
+        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", addedEpicOne.getUid());
+        taskManager.addSubtask(subtaskTwo);
+        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", addedEpicOne.getUid());
+        taskManager.addSubtask(subtaskThree);
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(subtaskOne.getUid(), subtaskTwo.getUid(), subtaskThree.getUid())));
         subtaskOne.setStatus(NEW);
         subtaskTwo.setStatus(IN_PROGRESS);
         subtaskThree.setStatus(DONE);
-        taskManager.update(uidEpicOne, epicOne);
+        taskManager.updateEpic(epicOne);
         assertEquals(IN_PROGRESS, epicOne.getStatus());
     }
 
     @Test
     void calculateEpicStatusDone() {
-        TaskManager taskManager = Managers.getDefault();
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", uidEpicOne);
-        int uidSubtaskTwo = taskManager.createTask(subtaskTwo);
-        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", uidEpicOne);
-        int uidSubtaskThree = taskManager.createTask(subtaskThree);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        taskManager.addSubtask(subtaskOne);
+        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", addedEpicOne.getUid());
+        taskManager.addSubtask(subtaskTwo);
+        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", addedEpicOne.getUid());
+        taskManager.addSubtask(subtaskThree);
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(subtaskOne.getUid(), subtaskTwo.getUid(), subtaskThree.getUid())));
 
         subtaskOne.setStatus(DONE);
         subtaskTwo.setStatus(DONE);
         subtaskThree.setStatus(DONE);
-        taskManager.update(uidEpicOne, epicOne);
+        taskManager.updateEpic(epicOne);
         assertEquals(DONE, epicOne.getStatus());
     }
 
     @Test
     void deleteAllTasks() {
-        TaskManager taskManager = Managers.getDefault();
         // две задачи
         Task taskOne = new Task("Name of task one", "Description of task one");
-        taskManager.createTask(taskOne);
+        taskManager.addTask(taskOne);
         Task taskTwo = new Task("Name of task two", "Description of task two");
-        taskManager.createTask(taskTwo);
+        taskManager.addTask(taskTwo);
         // эпик с тремя подзадачами
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", uidEpicOne);
-        int uidSubtaskTwo = taskManager.createTask(subtaskTwo);
-        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", uidEpicOne);
-        int uidSubtaskThree = taskManager.createTask(subtaskThree);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
-        taskManager.update(uidEpicOne, epicOne);
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        taskManager.addSubtask(subtaskOne);
+        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", addedEpicOne.getUid());
+        taskManager.addSubtask(subtaskTwo);
+        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", addedEpicOne.getUid());
+        taskManager.addSubtask(subtaskThree);
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(subtaskOne.getUid(), subtaskTwo.getUid(), subtaskThree.getUid())));
+
+        taskManager.updateEpic(epicOne);
         taskManager.deleteAllTasks();
-        assertTrue(taskManager.getTaskHashMap().isEmpty());
+        taskManager.deleteAllEpics();
+        taskManager.deleteAllSubtasks();
+
+        assertTrue(taskManager.getAllTasksList().isEmpty());
+        assertTrue(taskManager.getAllEpicsList().isEmpty());
+        assertTrue(taskManager.getAllSubtasksList().isEmpty());
     }
 
     @Test
-    void getTaskByUid() {
-        TaskManager taskManager = Managers.getDefault();
+    void getByUid() {
         Task taskOne = new Task("Name of task one", "Description of task one");
-        int uidTaskOne = taskManager.createTask(taskOne);
+        Task addedTaskOne = taskManager.addTask(taskOne);
+        Task getTaskOne = taskManager.getTaskByUid(addedTaskOne.getUid());
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
-        taskManager.update(uidEpicOne, epicOne);
-        assertEquals(taskOne, taskManager.getTaskHashMap().get(uidTaskOne));
-        assertEquals(epicOne, taskManager.getTaskHashMap().get(uidEpicOne));
-        assertEquals(subtaskOne, taskManager.getTaskHashMap().get(uidSubtaskOne));
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
+        Epic getEpicOne = taskManager.getEpicByUid(addedEpicOne.getUid());
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        Subtask addedSubtaskOne = taskManager.addSubtask(subtaskOne);
+        Subtask getSubtaskOneSubtaskOne = taskManager.getSubtaskByUid(addedSubtaskOne.getUid());
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(addedSubtaskOne.getUid())));
+        taskManager.updateEpic(addedEpicOne);
+        assertEquals(addedTaskOne, getTaskOne);
+        assertEquals(addedEpicOne, getEpicOne);
+        assertEquals(addedSubtaskOne, getSubtaskOneSubtaskOne);
     }
 
     @Test
-    void getTaskByUidWithEmptyTaskHashMap() {
-        TaskManager taskManager = Managers.getDefault();
+    void getByUidWithEmptyTaskHashMap() {
         Task taskOne = new Task("Name of task one", "Description of task one");
-        int uidTaskOne = taskManager.createTask(taskOne);
+        Task addedTaskOne = taskManager.addTask(taskOne);
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
-        taskManager.update(uidEpicOne, epicOne);
-        taskManager.getTaskHashMap().clear();
-        assertNull(taskManager.getTaskHashMap().get(uidTaskOne));
-        assertNull(taskManager.getTaskHashMap().get(uidEpicOne));
-        assertNull(taskManager.getTaskHashMap().get(uidSubtaskOne));
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        Subtask addedSubtaskOne = taskManager.addSubtask(subtaskOne);
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(addedSubtaskOne.getUid())));
+        taskManager.updateEpic(addedEpicOne);
+        taskManager.getAllTasksList().clear();
+        taskManager.getAllEpicsList().clear();
+        taskManager.getAllSubtasksList().clear();
+        final IncorrectUidException taskException = assertThrows(IncorrectUidException.class, () -> taskManager.getTaskByUid(addedTaskOne.getUid()));
+        assertEquals("Некорректный uid", taskException.getMessage());
+        final IncorrectUidException epicException = assertThrows(IncorrectUidException.class, () -> taskManager.getEpicByUid(addedEpicOne.getUid()));
+        assertEquals("Некорректный uid", epicException.getMessage());
+        final IncorrectUidException subTaskException = assertThrows(IncorrectUidException.class, () -> taskManager.getSubtaskByUid(addedSubtaskOne.getUid()));
+        assertEquals("Некорректный uid", subTaskException.getMessage());
     }
 
     @Test
     void createTask() {
-        TaskManager taskManager = Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        int uidTaskOne = taskManager.createTask(taskOne);
+        Task addedTaskOne = taskManager.addTask(taskOne);
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
-        taskManager.update(uidEpicOne, epicOne);
-        assertEquals(taskOne, taskManager.getTaskHashMap().get(uidTaskOne));
-        assertEquals(epicOne, taskManager.getTaskHashMap().get(uidEpicOne));
-        assertEquals(subtaskOne, taskManager.getTaskHashMap().get(uidSubtaskOne));
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        Subtask addedSubtaskOne = taskManager.addSubtask(subtaskOne);
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(addedSubtaskOne.getUid())));
+        taskManager.updateEpic(addedEpicOne);
+        assertEquals(taskOne, addedTaskOne);
+        assertEquals(epicOne, addedEpicOne);
+        assertEquals(subtaskOne, addedSubtaskOne);
     }
 
     @Test
     void update() {
-        TaskManager taskManager = Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        int uidTaskOne = taskManager.createTask(taskOne);
-        Task taskOneUpdated = new Task("Name of task one updated", "Description of task one updated");
-        taskOneUpdated.setUid(uidTaskOne);
+        Task addedTaskOne = taskManager.addTask(taskOne);
+        addedTaskOne.setName("Name of task updated");
+
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Epic epicOneUpdated = new Epic("Name of epic one updated", "Description of epic one updated");
-        epicOneUpdated.setUid(uidEpicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        Subtask subtaskOneUpdated = new Subtask("Name of subtask one updated", "Description of subtask one updated", uidEpicOne);
-        subtaskOneUpdated.setUid(uidSubtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
-        taskManager.update(uidTaskOne, taskOneUpdated);
-        taskManager.update(uidEpicOne, epicOneUpdated);
-        taskManager.update(uidSubtaskOne, subtaskOneUpdated);
-        assertEquals(taskOneUpdated, taskManager.getTaskHashMap().get(uidTaskOne));
-        assertEquals(epicOneUpdated, taskManager.getTaskHashMap().get(uidEpicOne));
-        assertEquals(subtaskOneUpdated, taskManager.getTaskHashMap().get(uidSubtaskOne));
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
+        addedEpicOne.setName("Name of epic updated");
+
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        Subtask addedSubtaskOne = taskManager.addSubtask(subtaskOne);
+        addedSubtaskOne.setName("Name of subtask updated");
+
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(addedSubtaskOne.getUid())));
+        taskManager.updateTask(addedTaskOne);
+        taskManager.updateEpic(addedEpicOne);
+        taskManager.updateSubtask(addedSubtaskOne);
+        assertEquals("Name of task updated", taskManager.getTaskByUid(addedTaskOne.getUid()).getName());
+        assertEquals("Name of epic updated", taskManager.getEpicByUid(addedEpicOne.getUid()).getName());
+        assertEquals("Name of subtask updated", taskManager.getSubtaskByUid(addedSubtaskOne.getUid()).getName());
     }
 
     @Test
     void updateWithEmptyTaskHashMap() {
-        TaskManager taskManager = Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        int uidTaskOne = taskManager.createTask(taskOne);
+        Task addedTaskOne = taskManager.addTask(taskOne);
         Task taskOneUpdated = new Task("Name of task one updated", "Description of task one updated");
-        taskOneUpdated.setUid(uidTaskOne);
+        taskOneUpdated.setUid(addedTaskOne.getUid());
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
         Epic epicOneUpdated = new Epic("Name of epic one updated", "Description of epic one updated");
-        epicOneUpdated.setUid(uidEpicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        Subtask subtaskOneUpdated = new Subtask("Name of subtask one updated", "Description of subtask one updated", uidEpicOne);
-        subtaskOneUpdated.setUid(uidSubtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
-        taskManager.getTaskHashMap().clear();
-        final IllegalArgumentException taskException = assertThrows(IllegalArgumentException.class, () -> taskManager.update(uidTaskOne, taskOneUpdated));
+        epicOneUpdated.setUid(addedEpicOne.getUid());
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        Subtask addedSubtaskOne = taskManager.addSubtask(subtaskOne);
+        Subtask subtaskOneUpdated = new Subtask("Name of subtask one updated", "Description of subtask one updated", addedEpicOne.getUid());
+        subtaskOneUpdated.setUid(addedSubtaskOne.getUid());
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(addedSubtaskOne.getUid())));
+        taskManager.getAllTasksList().clear();
+        taskManager.getAllEpicsList().clear();
+        taskManager.getAllSubtasksList().clear();
+        final IncorrectUidException taskException = assertThrows(IncorrectUidException.class, () -> taskManager.updateTask(taskOneUpdated));
         assertEquals("Некорректный uid", taskException.getMessage());
-        final IllegalArgumentException epicException = assertThrows(IllegalArgumentException.class, () -> taskManager.update(uidEpicOne, epicOneUpdated));
+        final IncorrectUidException epicException = assertThrows(IncorrectUidException.class, () -> taskManager.updateEpic(epicOneUpdated));
         assertEquals("Некорректный uid", epicException.getMessage());
-        final IllegalArgumentException subTaskException = assertThrows(IllegalArgumentException.class, () -> taskManager.update(uidSubtaskOne, subtaskOneUpdated));
+        final IncorrectUidException subTaskException = assertThrows(IncorrectUidException.class, () -> taskManager.updateSubtask(subtaskOneUpdated));
         assertEquals("Некорректный uid", subTaskException.getMessage());
     }
 
     @Test
     void deleteByUid() {
-        TaskManager taskManager = Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        int uidTaskOne = taskManager.createTask(taskOne);
+        taskManager.addTask(taskOne);
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
-        taskManager.update(uidEpicOne, epicOne);
-        taskManager.deleteByUid(taskOne.getUid());
-        taskManager.deleteByUid(subtaskOne.getUid());
-        taskManager.deleteByUid(epicOne.getUid());
-        assertNull(taskManager.getTaskHashMap().get(uidTaskOne));
-        assertNull(taskManager.getTaskHashMap().get(uidEpicOne));
-        assertNull(taskManager.getTaskHashMap().get(uidSubtaskOne));
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        Subtask addedSubtaskOne = taskManager.addSubtask(subtaskOne);
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(addedSubtaskOne.getUid())));
+        taskManager.updateEpic(epicOne);
+        taskManager.deleteTaskByUid(taskOne.getUid());
+        taskManager.deleteSubtaskByUid(subtaskOne.getUid());
+        taskManager.deleteEpicByUid(epicOne.getUid());
+        assertTrue(taskManager.getAllTasksList().isEmpty());
+        assertTrue(taskManager.getAllEpicsList().isEmpty());
+        assertTrue(taskManager.getAllSubtasksList().isEmpty());
     }
 
     @Test
     void deleteByUidWithEmptyTaskHashMap() {
-        TaskManager taskManager = Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        int uidTaskOne = taskManager.createTask(taskOne);
+        Task addedTaskOne = taskManager.addTask(taskOne);
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
-        int uidEpicOne = taskManager.createTask(epicOne);
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", uidEpicOne);
-        int uidSubtaskOne = taskManager.createTask(subtaskOne);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne)));
-        taskManager.update(uidEpicOne, epicOne);
-        taskManager.getTaskHashMap().clear();
-        final IncorrectUidException taskException = assertThrows(IncorrectUidException.class, () -> taskManager.deleteByUid(uidTaskOne));
+        Epic addedEpicOne = taskManager.addEpic(epicOne);
+        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", addedEpicOne.getUid());
+        Subtask addedSubtaskOne = taskManager.addSubtask(subtaskOne);
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(addedSubtaskOne.getUid())));
+        taskManager.updateEpic(epicOne);
+        taskManager.getAllTasksList().clear();
+        taskManager.getAllEpicsList().clear();
+        taskManager.getAllSubtasksList().clear();
+        final IncorrectUidException taskException = assertThrows(IncorrectUidException.class, () -> taskManager.deleteTaskByUid(addedTaskOne.getUid()));
         assertEquals("Некорректный uid", taskException.getMessage());
-        final IncorrectUidException epicException = assertThrows(IncorrectUidException.class, () -> taskManager.deleteByUid(uidEpicOne));
+        final IncorrectUidException epicException = assertThrows(IncorrectUidException.class, () -> taskManager.deleteEpicByUid(addedEpicOne.getUid()));
         assertEquals("Некорректный uid", epicException.getMessage());
-        final IncorrectUidException subTaskException = assertThrows(IncorrectUidException.class, () -> taskManager.deleteByUid(uidSubtaskOne));
+        final IncorrectUidException subTaskException = assertThrows(IncorrectUidException.class, () -> taskManager.deleteSubtaskByUid(addedSubtaskOne.getUid()));
         assertEquals("Некорректный uid", subTaskException.getMessage());
     }
 
     @Test
     void history() {
-        TaskManager taskManager = Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        int uidTaskOne = taskManager.createTask(taskOne);
-        taskManager.getTaskByUid(uidTaskOne);
+        Task addedTaskOne = taskManager.addTask(taskOne);
+        taskManager.getTaskByUid(addedTaskOne.getUid());
         assertEquals(1, taskManager.history().size());
     }
 
     @Test
     void historyWithEmptyTaskHashMap() {
-        TaskManager taskManager = Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        int uidTaskOne = taskManager.createTask(taskOne);
-        taskManager.getTaskHashMap().clear();
-        final IncorrectUidException taskException = assertThrows(IncorrectUidException.class, () -> taskManager.deleteByUid(uidTaskOne));
+        Task addedTaskOne = taskManager.addTask(taskOne);
+        taskManager.getAllTasksList().clear();
+        final IncorrectUidException taskException = assertThrows(IncorrectUidException.class, () -> taskManager.deleteTaskByUid(addedTaskOne.getUid()));
         assertEquals("Некорректный uid", taskException.getMessage());
         assertEquals(0, taskManager.history().size());
     }

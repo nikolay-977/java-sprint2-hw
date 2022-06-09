@@ -1,12 +1,11 @@
 package tracker.model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 
 public class Epic extends Task {
     private LocalDateTime endTime;
-    private HashSet<Integer> subtaskUidSet;
+    private Set<Integer> subtaskUidSet;
 
     public Epic(String name, String description) {
         super(name, description);
@@ -26,11 +25,11 @@ public class Epic extends Task {
         this.subtaskUidSet = new HashSet<>();
     }
 
-    public HashSet<Integer> getSubtaskUidSet() {
+    public Set<Integer> getSubtaskUidSet() {
         return subtaskUidSet;
     }
 
-    public void setSubtaskUidSet(HashSet<Integer> subtaskUidSet) {
+    public void setSubtaskUidSet(Set<Integer> subtaskUidSet) {
         this.subtaskUidSet = subtaskUidSet;
     }
 
@@ -56,7 +55,7 @@ public class Epic extends Task {
         if (!(o instanceof Epic)) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return Objects.equals(getEndTime(), epic.getEndTime()) && Objects.equals(getSubtaskUidSet(), epic.getSubtaskUidSet());
+        return Objects.equals(getSubtaskUidSet(), epic.getSubtaskUidSet());
     }
 
     @Override

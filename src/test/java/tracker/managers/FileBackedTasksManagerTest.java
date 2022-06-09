@@ -21,17 +21,17 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     void emptyTaskHashMap() {
         taskManager.save();
         FileBackedTasksManager taskManagerFromFile = FileBackedTasksManager.loadFromFile(new File(FILE_NAME));
-        assertTrue(taskManagerFromFile.getTaskHashMap().isEmpty());
+        assertTrue(taskManagerFromFile.getAllTasksList().isEmpty());
     }
 
     //    b. Эпик без подзадач.
     @Test
     void epicWithoutSubtasks() {
         Epic epicWithoutSubtasks = new Epic("Name of epic without subtasks", "Description of epic without subtasks");
-        taskManager.createTask(epicWithoutSubtasks);
+        taskManager.addTask(epicWithoutSubtasks);
         taskManager.save();
         FileBackedTasksManager taskManagerFromFile = FileBackedTasksManager.loadFromFile(new File(FILE_NAME));
-        assertEquals(Collections.emptyList(), taskManagerFromFile.getEpicSubtaskList(epicWithoutSubtasks));
+        assertEquals(Collections.emptyList(), taskManagerFromFile.getSubtaskOfEpic(epicWithoutSubtasks));
     }
 
     //    c. Пустой список истории.

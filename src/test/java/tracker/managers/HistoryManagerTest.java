@@ -8,20 +8,18 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HistoryManagerTest {
-
+    InMemoryTaskManager taskManager = new InMemoryTaskManager();
     //    a. Пустая история задач.
     @Test
     void emptyHistory() {
-        TaskManager taskManager = Managers.getDefault();
         assertEquals(Collections.emptyList(), taskManager.history());
     }
 
     //    b. Дублирование.
     @Test
     void duplicate() {
-        TaskManager taskManager = Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        taskManager.createTask(taskOne);
+        taskManager.addTask(taskOne);
         taskManager.getTaskByUid(taskOne.getUid());
         taskManager.getTaskByUid(taskOne.getUid());
         assertEquals(1, taskManager.history().size());
@@ -30,13 +28,12 @@ class HistoryManagerTest {
     //    с. Удаление из истории: начало.
     @Test
     void deleteFromBeginning() {
-        InMemoryTaskManager taskManager = (InMemoryTaskManager) Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        taskManager.createTask(taskOne);
+        taskManager.addTask(taskOne);
         Task taskTwo = new Task("Name of task two", "Description of task two");
-        taskManager.createTask(taskTwo);
+        taskManager.addTask(taskTwo);
         Task taskThree = new Task("Name of task three", "Description of task three");
-        taskManager.createTask(taskThree);
+        taskManager.addTask(taskThree);
         taskManager.getTaskByUid(taskOne.getUid());
         taskManager.getTaskByUid(taskTwo.getUid());
         taskManager.getTaskByUid(taskThree.getUid());
@@ -47,13 +44,12 @@ class HistoryManagerTest {
     //    с. Удаление из истории: середина.
     @Test
     void deleteFromMiddle() {
-        InMemoryTaskManager taskManager = (InMemoryTaskManager) Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        taskManager.createTask(taskOne);
+        taskManager.addTask(taskOne);
         Task taskTwo = new Task("Name of task two", "Description of task two");
-        taskManager.createTask(taskTwo);
+        taskManager.addTask(taskTwo);
         Task taskThree = new Task("Name of task three", "Description of task three");
-        taskManager.createTask(taskThree);
+        taskManager.addTask(taskThree);
         taskManager.getTaskByUid(taskOne.getUid());
         taskManager.getTaskByUid(taskTwo.getUid());
         taskManager.getTaskByUid(taskThree.getUid());
@@ -64,13 +60,12 @@ class HistoryManagerTest {
     //    с. Удаление из истории: конец.
     @Test
     void deleteFromEnd() {
-        InMemoryTaskManager taskManager = (InMemoryTaskManager) Managers.getDefault();
         Task taskOne = new Task("Name of task one", "Description of task one");
-        taskManager.createTask(taskOne);
+        taskManager.addTask(taskOne);
         Task taskTwo = new Task("Name of task two", "Description of task two");
-        taskManager.createTask(taskTwo);
+        taskManager.addTask(taskTwo);
         Task taskThree = new Task("Name of task three", "Description of task three");
-        taskManager.createTask(taskThree);
+        taskManager.addTask(taskThree);
         taskManager.getTaskByUid(taskOne.getUid());
         taskManager.getTaskByUid(taskTwo.getUid());
         taskManager.getTaskByUid(taskThree.getUid());

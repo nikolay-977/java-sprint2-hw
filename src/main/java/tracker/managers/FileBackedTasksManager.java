@@ -4,6 +4,7 @@ import tracker.exceptions.ManagerSaveException;
 import tracker.model.*;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -12,10 +13,13 @@ import static tracker.model.Task.FORMATTER;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private final File tasksFile;
-    private final File tasksHistoryFile;
+    private File tasksFile;
+    private File tasksHistoryFile;
 
     private List<Integer> historyIdList = new ArrayList<>();
+
+    public FileBackedTasksManager(URI url) {
+    }
 
     public FileBackedTasksManager(File tasksFile) {
         this.tasksFile = tasksFile;
@@ -29,7 +33,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             return super.history();
         } else {
             for (Integer historyId : historyIdList) {
-                taskList.add(taskHashMap.get(historyId));
+                taskList.add(tasks.get(historyId));
             }
         }
         return taskList;
@@ -46,21 +50,57 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Integer createTask(Task task) {
-        Integer id = super.createTask(task);
-        save();
-        return id;
-    }
-
-    @Override
-    public void update(Integer uid, Task task) {
-        super.update(uid, task);
+    public void deleteAllEpics() {
+        super.deleteAllEpics();
         save();
     }
 
     @Override
-    public void deleteByUid(Integer uid) {
-        super.deleteByUid(uid);
+    public void deleteAllSubtasks() {
+        super.deleteAllSubtasks();
+        save();
+    }
+
+    @Override
+    public Task addTask(Task task) {
+        Task addedTask = super.addTask(task);
+        save();
+        return addedTask;
+    }
+
+    @Override
+    public void updateTask(Task task) {
+        super.updateTask(task);
+        save();
+    }
+
+    @Override
+    public void updateEpic(Epic epic) {
+        super.updateEpic(epic);
+        save();
+    }
+
+    @Override
+    public void updateSubtask(Subtask subtask) {
+        super.updateSubtask(subtask);
+        save();
+    }
+
+    @Override
+    public void deleteTaskByUid(Integer uid) {
+        super.deleteTaskByUid(uid);
+        save();
+    }
+
+    @Override
+    public void deleteEpicByUid(Integer uid) {
+        super.deleteEpicByUid(uid);
+        save();
+    }
+
+    @Override
+    public void deleteSubtaskByUid(Integer uid) {
+        super.deleteSubtaskByUid(uid);
         save();
     }
 
@@ -80,7 +120,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         for (int i = 1; i < lines.size(); i++) {
             Task task = fileBackedTasksManager.taskFromString(lines.get(i));
-            fileBackedTasksManager.taskHashMap.put(task.getUid(), task);
+            fileBackedTasksManager.tasks.add(task);
         }
 
         fileBackedTasksManager.setHistoryIdList(loadFromHistoryFile(fileBackedTasksManager.tasksHistoryFile));
@@ -91,8 +131,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public void save() {
         try (FileWriter writer = new FileWriter(tasksFile, StandardCharsets.UTF_8)) {
             writer.write("id,type,name,status,description,start_time,duration,epic\n");
-            for (Map.Entry<Integer, Task> taskEntry : taskHashMap.entrySet()) {
-                writer.write(toString(taskEntry.getValue()));
+            for (Task task : tasks) {
+                writer.write(toString(task));
             }
         } catch (IOException ignored) {
             throw new ManagerSaveException(String.format("Произошла ошибка во время записи файла: %s", tasksFile));
@@ -187,29 +227,29 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         LocalDateTime taskOneStartTime = LocalDateTime.now();
         long taskOneDuration = 1L;
         Task taskOne = new Task("Name of task one", "Description of task one", taskOneStartTime, taskOneDuration);
-        fileBackedTasksManager.createTask(taskOne);
+        fileBackedTasksManager.addTask(taskOne);
         LocalDateTime taskTwoStartTime = taskOneStartTime.plusMinutes(2l);
         long taskTwoDuration = 1L;
         Task taskTwo = new Task("Name of task two", "Description of task two", taskTwoStartTime, taskTwoDuration);
-        fileBackedTasksManager.createTask(taskTwo);
+        fileBackedTasksManager.addTask(taskTwo);
         // эпик с тремя подзадачами
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
         epicOne.setStartTime(taskTwoStartTime.plusDays(1L));
-        int uidEpicOne = fileBackedTasksManager.createTask(epicOne);
+        Epic addedEpicOne = fileBackedTasksManager.addEpic(epicOne);
         LocalDateTime subtaskOneStartTime = taskTwoStartTime.plusMinutes(2l);
         long subtaskOneDuration = 1L;
-        Subtask subtaskOne = new Subtask("Name of subtask one", "Description of subtask one", subtaskOneStartTime, subtaskOneDuration, uidEpicOne);
-        int uidSubtaskOne = fileBackedTasksManager.createTask(subtaskOne);
+        Subtask subtaskDraftOne = new Subtask("Name of subtask one", "Description of subtask one", subtaskOneStartTime, subtaskOneDuration, addedEpicOne.getUid());
+        Subtask subtaskOne = fileBackedTasksManager.addSubtask(subtaskDraftOne);
         LocalDateTime subtaskTwoStartTime = subtaskOneStartTime.plusMinutes(2l);
         long subtaskTwoDuration = 1L;
-        Subtask subtaskTwo = new Subtask("Name of subtask two", "Description of subtask two", subtaskTwoStartTime, subtaskTwoDuration, uidEpicOne);
-        int uidSubtaskTwo = fileBackedTasksManager.createTask(subtaskTwo);
+        Subtask subtaskDraftTwo = new Subtask("Name of subtask two", "Description of subtask two", subtaskTwoStartTime, subtaskTwoDuration, addedEpicOne.getUid());
+        Subtask subtaskTwo = fileBackedTasksManager.addSubtask(subtaskDraftTwo);
         LocalDateTime subtaskThreeStartTime = subtaskTwoStartTime.plusMinutes(2l);
         long subtaskThreeDuration = 1L;
-        Subtask subtaskThree = new Subtask("Name of subtask three", "Description of subtask three", subtaskThreeStartTime, subtaskThreeDuration, uidEpicOne);
-        int uidSubtaskThree = fileBackedTasksManager.createTask(subtaskThree);
-        epicOne.setSubtaskUidSet(new HashSet<>(List.of(uidSubtaskOne, uidSubtaskTwo, uidSubtaskThree)));
-        fileBackedTasksManager.update(epicOne.getUid(), epicOne);
+        Subtask subtaskDraftThree = new Subtask("Name of subtask three", "Description of subtask three", subtaskThreeStartTime, subtaskThreeDuration, addedEpicOne.getUid());
+        Subtask subtaskThree = fileBackedTasksManager.addSubtask(subtaskDraftThree);
+        epicOne.setSubtaskUidSet(new HashSet<>(List.of(subtaskOne.getUid(), subtaskTwo.getUid(), subtaskTwo.getUid())));
+        fileBackedTasksManager.updateEpic(epicOne);
         // История просмотров задач
         // Запросите некоторые из них, чтобы заполнилась история просмотра
         fileBackedTasksManager.getTaskByUid(taskOne.getUid());
@@ -230,17 +270,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         fileBackedTasksManager.getTaskByUid(subtaskTwo.getUid());
         System.out.println("+++ История просмотров задач +++");
         System.out.println(fileBackedTasksManager.history());
-        fileBackedTasksManager.getTaskByUid(subtaskOne.getUid());
+        fileBackedTasksManager.getTaskByUid(subtaskDraftOne.getUid());
         System.out.println("+++ История просмотров задач +++");
         System.out.println(fileBackedTasksManager.history());
         fileBackedTasksManager.getTaskByUid(subtaskThree.getUid());
         System.out.println("+++ История просмотров задач +++");
         System.out.println(fileBackedTasksManager.history());
         // удалите задачу, которая есть в истории, и проверьте, что при печати она не будет выводиться;
-        fileBackedTasksManager.deleteByUid(taskOne.getUid());
+        fileBackedTasksManager.deleteTaskByUid(taskOne.getUid());
         System.out.println("+++ История просмотров задач +++");
         System.out.println(fileBackedTasksManager.history());
-        fileBackedTasksManager.deleteByUid(epicOne.getUid());
+        fileBackedTasksManager.deleteEpicByUid(epicOne.getUid());
         System.out.println("+++ История просмотров задач +++");
         System.out.println(fileBackedTasksManager.history());
         // Создайте новый FileBackedTasksManager менеджер из этого же файла

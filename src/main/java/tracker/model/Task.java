@@ -122,16 +122,11 @@ public class Task {
         if (this == o) return true;
         if (!(o instanceof Task)) return false;
         Task task = (Task) o;
-        return Objects.equals(getName(), task.getName()) && Objects.equals(getDescription(), task.getDescription())
-                && Objects.equals(getUid(), task.getUid())
-                && getStatus() == task.getStatus()
-                && getType() == task.getType()
-                && getStartTime() == task.getStartTime()
-                && getDuration() == task.getDuration();
+        return getDuration() == task.getDuration() && Objects.equals(getUid(), task.getUid()) && getType() == task.getType() && getName().equals(task.getName()) && getStatus() == task.getStatus() && Objects.equals(getDescription(), task.getDescription()) && Objects.equals(getStartTime(), task.getStartTime());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getDescription(), getUid(), getStatus(), getType());
+        return Objects.hash(getType(), getName(), getStatus(), getDescription(), getStartTime(), getDuration());
     }
 }
