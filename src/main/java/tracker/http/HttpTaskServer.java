@@ -12,13 +12,22 @@ import tracker.model.Task;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.text.MessageFormat;
 import java.util.*;
+
+import static tracker.constants.StatusCode.SC_200;
+import static tracker.constants.StatusCode.SC_405;
 
 public class HttpTaskServer {
     private final TaskManager manager;
     private final HttpServer server;
     public static final int PORT = 8081;
     private Gson gson = new Gson();
+    public static final String GET = "GET";
+    public static final String POST = "POST";
+    public static final String DELETE = "DELETE";
+    public static final String ID = "?id=";
+    private static final String ERROR_MESSAGE = "Произошла ошибка во время обработки хендлером {0} {1}";
 
     public HttpTaskServer(TaskManager httpManager) throws IOException {
         this.manager = httpManager;
@@ -36,10 +45,10 @@ public class HttpTaskServer {
             try {
                 String id;
                 switch (h.getRequestMethod()) {
-                    case "GET":
+                    case GET:
                         id = h.getRequestURI().toString().substring(request.length());
-                        if (id.startsWith("?id=")) {
-                            id = id.substring("?id=".length());
+                        if (id.startsWith(ID)) {
+                            id = id.substring(ID.length());
                         }
                         if (id.isEmpty()) {
                             String response = gson.toJson(manager.getAllTasksList(), new TypeToken<List<Task>>() {
@@ -51,11 +60,11 @@ public class HttpTaskServer {
                             sendText(h, response);
                         }
                         break;
-                    case "POST":
+                    case POST:
                         id = h.getRequestURI().toString().substring(request.length());
                         String value = readText(h);
-                        if (id.startsWith("?id=")) {
-                            id = id.substring("?id=".length());
+                        if (id.startsWith(ID)) {
+                            id = id.substring(ID.length());
                         }
                         Task task = gson.fromJson(value, Task.class);
                         if (id.isEmpty()) {
@@ -70,10 +79,10 @@ public class HttpTaskServer {
                             sendText(h, response);
                         }
                         break;
-                    case "DELETE":
+                    case DELETE:
                         id = h.getRequestURI().toString().substring(request.length());
-                        if (id.startsWith("?id=")) {
-                            id = id.substring("?id=".length());
+                        if (id.startsWith(ID)) {
+                            id = id.substring(ID.length());
                         }
                         if (id.isEmpty()) {
                             manager.deleteAllTasks();
@@ -85,10 +94,10 @@ public class HttpTaskServer {
                         break;
                     default:
                         System.out.println("Неизвестный тип запроса: " + h.getRequestMethod());
-                        h.sendResponseHeaders(405, 0);
+                        h.sendResponseHeaders(SC_405, 0);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                throw new RuntimeException(MessageFormat.format(ERROR_MESSAGE, "taskHandler", ex.getMessage()));
             } finally {
                 h.close();
             }
@@ -100,10 +109,10 @@ public class HttpTaskServer {
             try {
                 String id;
                 switch (h.getRequestMethod()) {
-                    case "GET":
+                    case GET:
                         id = h.getRequestURI().toString().substring(request.length());
-                        if (id.startsWith("?id=")) {
-                            id = id.substring("?id=".length());
+                        if (id.startsWith(ID)) {
+                            id = id.substring(ID.length());
                         }
                         if (id.isEmpty()) {
                             String response = gson.toJson(manager.getAllTasksList(), new TypeToken<List<Task>>() {
@@ -115,11 +124,11 @@ public class HttpTaskServer {
                             sendText(h, response);
                         }
                         break;
-                    case "POST":
+                    case POST:
                         id = h.getRequestURI().toString().substring(request.length());
                         String value = readText(h);
-                        if (id.startsWith("?id=")) {
-                            id = id.substring("?id=".length());
+                        if (id.startsWith(ID)) {
+                            id = id.substring(ID.length());
                         }
                         Epic epic = gson.fromJson(value, Epic.class);
                         if (id.isEmpty()) {
@@ -134,10 +143,10 @@ public class HttpTaskServer {
                             sendText(h, response);
                         }
                         break;
-                    case "DELETE":
+                    case DELETE:
                         id = h.getRequestURI().toString().substring(request.length());
-                        if (id.startsWith("?id=")) {
-                            id = id.substring("?id=".length());
+                        if (id.startsWith(ID)) {
+                            id = id.substring(ID.length());
                         }
                         if (id.isEmpty()) {
                             manager.deleteAllEpics();
@@ -148,10 +157,10 @@ public class HttpTaskServer {
                         break;
                     default:
                         System.out.println("Неизвестный тип запроса: " + h.getRequestMethod());
-                        h.sendResponseHeaders(405, 0);
+                        h.sendResponseHeaders(SC_405, 0);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                throw new RuntimeException(MessageFormat.format(ERROR_MESSAGE, "epicHandler", ex.getMessage()));
             } finally {
                 h.close();
             }
@@ -163,10 +172,10 @@ public class HttpTaskServer {
             try {
                 String id;
                 switch (h.getRequestMethod()) {
-                    case "GET":
+                    case GET:
                         id = h.getRequestURI().toString().substring(request.length());
-                        if (id.startsWith("?id=")) {
-                            id = id.substring("?id=".length());
+                        if (id.startsWith(ID)) {
+                            id = id.substring(ID.length());
                         }
                         if (id.isEmpty()) {
                             String response = gson.toJson(manager.getAllTasksList(), new TypeToken<List<Task>>() {
@@ -178,11 +187,11 @@ public class HttpTaskServer {
                             sendText(h, response);
                         }
                         break;
-                    case "POST":
+                    case POST:
                         id = h.getRequestURI().toString().substring(request.length());
                         String value = readText(h);
-                        if (id.startsWith("?id=")) {
-                            id = id.substring("?id=".length());
+                        if (id.startsWith(ID)) {
+                            id = id.substring(ID.length());
                         }
                         Subtask subtask = gson.fromJson(value, Subtask.class);
                         if (id.isEmpty()) {
@@ -197,10 +206,10 @@ public class HttpTaskServer {
                             sendText(h, response);
                         }
                         break;
-                    case "DELETE":
+                    case DELETE:
                         id = h.getRequestURI().toString().substring(request.length());
-                        if (id.startsWith("?id=")) {
-                            id = id.substring("?id=".length());
+                        if (id.startsWith(ID)) {
+                            id = id.substring(ID.length());
                         }
                         if (id.isEmpty()) {
                             manager.deleteAllSubtasks();
@@ -212,10 +221,10 @@ public class HttpTaskServer {
                         break;
                     default:
                         System.out.println("Неизвестный тип запроса: " + h.getRequestMethod());
-                        h.sendResponseHeaders(405, 0);
+                        h.sendResponseHeaders(SC_405, 0);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                throw new RuntimeException(MessageFormat.format(ERROR_MESSAGE, "subtaskHandler", ex.getMessage()));
             } finally {
                 h.close();
             }
@@ -226,7 +235,7 @@ public class HttpTaskServer {
         return (h) -> {
             try {
                 switch (h.getRequestMethod()) {
-                    case "GET":
+                    case GET:
                         String id = h.getRequestURI().toString().substring(request.length());
                         int uid = Integer.parseInt(id);
                         Epic epic = manager.getEpicByUid(uid);
@@ -237,10 +246,10 @@ public class HttpTaskServer {
                         break;
                     default:
                         System.out.println("Неизвестный тип запроса: " + h.getRequestMethod());
-                        h.sendResponseHeaders(405, 0);
+                        h.sendResponseHeaders(SC_405, 0);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                throw new RuntimeException(MessageFormat.format(ERROR_MESSAGE, "subtaskOfEpicHandler", ex.getMessage()));
             } finally {
                 h.close();
             }
@@ -251,7 +260,7 @@ public class HttpTaskServer {
         return (h) -> {
             try {
                 switch (h.getRequestMethod()) {
-                    case "GET":
+                    case GET:
                         List<Task> taskList = manager.history();
                         String response = gson.toJson(taskList, new TypeToken<List<Task>>() {
                         }.getType());
@@ -259,10 +268,10 @@ public class HttpTaskServer {
                         break;
                     default:
                         System.out.println("Неизвестный тип запроса: " + h.getRequestMethod());
-                        h.sendResponseHeaders(405, 0);
+                        h.sendResponseHeaders(SC_405, 0);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                throw new RuntimeException(MessageFormat.format(ERROR_MESSAGE, "historyHandler", ex.getMessage()));
             } finally {
                 h.close();
             }
@@ -273,7 +282,7 @@ public class HttpTaskServer {
         return (h) -> {
             try {
                 switch (h.getRequestMethod()) {
-                    case "GET":
+                    case GET:
                         Set<Task> taskList = manager.getPrioritizedTasks();
                         String response = gson.toJson(taskList, new TypeToken<Set<Task>>() {
                         }.getType());
@@ -281,20 +290,20 @@ public class HttpTaskServer {
                         break;
                     default:
                         System.out.println("Неизвестный тип запроса: " + h.getRequestMethod());
-                        h.sendResponseHeaders(405, 0);
+                        h.sendResponseHeaders(SC_405, 0);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                throw new RuntimeException(MessageFormat.format(ERROR_MESSAGE, "prioritizedHandler", ex.getMessage()));
             } finally {
                 h.close();
             }
         };
     }
 
-    protected String readText(HttpExchange h) throws IOException {
+    protected String readText(HttpExchange exchange) throws IOException {
         List<Byte> listBytes = new ArrayList<Byte>();
         int bodyBytes;
-        while ((bodyBytes = h.getRequestBody().read()) != -1) {
+        while ((bodyBytes = exchange.getRequestBody().read()) != -1) {
             listBytes.add((byte) bodyBytes);
         }
         byte[] bytes = new byte[listBytes.size()];
@@ -305,11 +314,11 @@ public class HttpTaskServer {
         return new String(bytes, "UTF-8");
     }
 
-    protected void sendText(HttpExchange h, String text) throws IOException {
+    protected void sendText(HttpExchange exchange, String text) throws IOException {
         byte[] resp = text.getBytes("UTF-8");
-        h.getResponseHeaders().add("Content-Type", "application/json");
-        h.sendResponseHeaders(200, resp.length);
-        h.getResponseBody().write(resp);
+        exchange.getResponseHeaders().add("Content-Type", "application/json");
+        exchange.sendResponseHeaders(SC_200, resp.length);
+        exchange.getResponseBody().write(resp);
     }
 
     public void start() {

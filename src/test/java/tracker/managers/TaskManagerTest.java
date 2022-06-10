@@ -1,5 +1,6 @@
 package tracker.managers;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tracker.exceptions.IncorrectUidException;
 import tracker.model.Epic;
@@ -19,7 +20,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
         this.taskManager = taskManager;
     }
 
-    //    Для подзадач нужно дополнительно проверить наличие эпика
     @Test
     void getEpicSubtaskList() {
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");
@@ -31,7 +31,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(epicOne.getUid(), subtaskOne.getEpicUid());
     }
 
-    //    расчёт статуса для эпика
     @Test
     void calculateEpicStatusNew() {
         Epic epicOne = new Epic("Name of epic one", "Description of epic one");

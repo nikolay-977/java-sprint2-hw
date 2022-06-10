@@ -14,7 +14,7 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         super(url);
         this.client = new KVTaskClient(url);
         client.register();
-        apiKey = client.getApiToken();
+        this.apiKey = client.getApiToken();
     }
 
     @Override
@@ -33,7 +33,6 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 }
 

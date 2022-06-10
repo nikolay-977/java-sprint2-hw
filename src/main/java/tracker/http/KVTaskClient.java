@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.text.MessageFormat;
 
 public class KVTaskClient {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -24,12 +25,12 @@ public class KVTaskClient {
         try {
             String apiKey = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
             if (apiKey == null) {
-                throw new IllegalStateException("apiKey");
+                throw new IllegalStateException("Получено значение null для apiKey");
             } else {
                 this.apiToken = apiKey;
             }
         } catch (IOException | InterruptedException e) {
-            throw new IllegalStateException("Ошибка во время регистрации KV клиента");
+            throw new IllegalStateException(MessageFormat.format("Ошибка во время регистрации KV клиента {0}", e.getMessage()));
         }
     }
 
@@ -41,7 +42,7 @@ public class KVTaskClient {
         try {
             client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
-            throw new IllegalArgumentException(String.format("Значение с ключом %s уже существует.", key));
+            throw new IllegalArgumentException(MessageFormat.format("Значение с ключом {0} уже существует. {1}", key, e.getMessage()));
         }
     }
 
@@ -59,7 +60,7 @@ public class KVTaskClient {
             }
 
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(MessageFormat.format("Ошибка во время получение данных KV клиентом {0}", e.getMessage()));
         }
     }
 } 

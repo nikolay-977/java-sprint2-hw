@@ -1,5 +1,6 @@
 package tracker.managers;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tracker.model.Epic;
 
@@ -16,16 +17,16 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         super(new FileBackedTasksManager(new File(FILE_NAME)));
     }
 
-    //    a. Пустой список задач.
     @Test
+    @DisplayName("Пустой список задач")
     void emptyTaskHashMap() {
         taskManager.save();
         FileBackedTasksManager taskManagerFromFile = FileBackedTasksManager.loadFromFile(new File(FILE_NAME));
         assertTrue(taskManagerFromFile.getAllTasksList().isEmpty());
     }
 
-    //    b. Эпик без подзадач.
     @Test
+    @DisplayName("Эпик без подзадач")
     void epicWithoutSubtasks() {
         Epic epicWithoutSubtasks = new Epic("Name of epic without subtasks", "Description of epic without subtasks");
         taskManager.addTask(epicWithoutSubtasks);
@@ -34,8 +35,8 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         assertEquals(Collections.emptyList(), taskManagerFromFile.getSubtaskOfEpic(epicWithoutSubtasks));
     }
 
-    //    c. Пустой список истории.
     @Test
+    @DisplayName("Пустой список истории")
     void emptyHistory() {
         taskManager.save();
         FileBackedTasksManager taskManagerFromFile = FileBackedTasksManager.loadFromFile(new File(FILE_NAME));

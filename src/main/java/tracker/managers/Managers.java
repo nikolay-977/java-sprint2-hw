@@ -6,8 +6,7 @@ import static tracker.http.KVServer.PORT;
 
 public class Managers {
     public static TaskManager getDefault() {
-        URI url = URI.create("http://localhost:" + PORT);
-        return new HTTPTaskManager(url);
+        return new HTTPTaskManager(URI.create("http://localhost:" + PORT));
     }
 
     public static HistoryManager getDefaultHistory() {

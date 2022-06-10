@@ -1,5 +1,6 @@
 package tracker.managers;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import tracker.model.Task;
 
@@ -9,14 +10,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HistoryManagerTest {
     InMemoryTaskManager taskManager = new InMemoryTaskManager();
-    //    a. Пустая история задач.
+
     @Test
+    @DisplayName("Пустая история задач")
     void emptyHistory() {
         assertEquals(Collections.emptyList(), taskManager.history());
     }
 
-    //    b. Дублирование.
     @Test
+    @DisplayName("Дублирование")
     void duplicate() {
         Task taskOne = new Task("Name of task one", "Description of task one");
         taskManager.addTask(taskOne);
@@ -25,8 +27,8 @@ class HistoryManagerTest {
         assertEquals(1, taskManager.history().size());
     }
 
-    //    с. Удаление из истории: начало.
     @Test
+    @DisplayName("Удаление из истории: начало")
     void deleteFromBeginning() {
         Task taskOne = new Task("Name of task one", "Description of task one");
         taskManager.addTask(taskOne);
@@ -41,8 +43,8 @@ class HistoryManagerTest {
         assertEquals(2, taskManager.history().size());
     }
 
-    //    с. Удаление из истории: середина.
     @Test
+    @DisplayName("Удаление из истории: середина")
     void deleteFromMiddle() {
         Task taskOne = new Task("Name of task one", "Description of task one");
         taskManager.addTask(taskOne);
@@ -57,8 +59,8 @@ class HistoryManagerTest {
         assertEquals(2, taskManager.history().size());
     }
 
-    //    с. Удаление из истории: конец.
     @Test
+    @DisplayName("Удаление из истории: конец")
     void deleteFromEnd() {
         Task taskOne = new Task("Name of task one", "Description of task one");
         taskManager.addTask(taskOne);
